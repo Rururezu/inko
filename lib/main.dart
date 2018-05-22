@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'models/booru_image.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new HomePage(title: 'Flutter Demo Home Page'),
+      home: new HomePage(title: 'Inko'),
     );
   }
 }
@@ -97,13 +98,17 @@ Future<List<BooruImage>> _getBooruImages() async {
 
 List<Widget> _createImageCards(List<BooruImage> images) {
   List<Widget> imageCards = new List();
-  images.map((image){
+  images.forEach((image){
     Widget card = new GridTile(
       footer: new GridTileBar(
+        backgroundColor: Colors.black54,
         title: new Text(image.image),
       ),
       child: new GestureDetector(
-        child: new Image.network(image.fileUrl),
+        child: new FadeInImage.memoryNetwork(
+          placeholder: kTransparentImage,
+          image: image.fileUrl,
+        ),
         onTap: (){},
       ),
     );
