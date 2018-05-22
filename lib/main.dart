@@ -27,22 +27,36 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   final String title;
   HomePage({this.title});
+  @override
+  HomePageState createState() {
+    return new HomePageState();
+  }
+}
+
+class HomePageState extends State<HomePage> {
+
+  String tags;
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(title),
+        title: new Text(widget.title),
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.search, color: Colors.white,),
-            onPressed: (){},
+            onPressed: (){
+              setState(() {
+                tags = "aisaka_taiga";                
+              });
+            },
           ),
         ],
       ),
-      body: new Content(tags: "misaka_mikoto"),
+      body: new Content(tags: tags),
     );
   }
 }
