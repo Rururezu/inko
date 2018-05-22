@@ -34,14 +34,23 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(title)
+        title: new Text(title),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.search, color: Colors.white,),
+            onPressed: (){},
+          ),
+        ],
       ),
-      body: new Content(),
+      body: new Content(tags: "misaka_mikoto"),
     );
   }
 }
 
 class Content extends StatefulWidget {
+  final String tags;
+  Content({this.tags});
+
   @override
   _ContentState createState() => new _ContentState();
 }
@@ -52,7 +61,7 @@ class _ContentState extends State<Content> {
   Widget build(BuildContext context) {
     return new Container(
       child: new FutureBuilder(
-        future: _getBooruImages(),
+        future: _getBooruImages(widget.tags),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           if(!snapshot.hasData) {
             return new Center(child: new CircularProgressIndicator(),);
@@ -79,11 +88,11 @@ class _ContentState extends State<Content> {
   }
 }
 
-Future<List<BooruImage>> _getBooruImages() async {
+Future<List<BooruImage>> _getBooruImages(String tags) async {
 
   var httpClient = new HttpClient();
   try {
-    var request = await httpClient.getUrl(Uri.parse(BASE_URL));
+    var request = await httpClient.getUrl(Uri.parse("$BASE_URL&tags=$tags"));
     var response = await request.close();
     if (response.statusCode == HttpStatus.OK) {
       var jsonResponse = await response.transform(utf8.decoder).join();
