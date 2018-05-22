@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'models/booru_image.dart';
 
@@ -45,6 +47,7 @@ class Content extends StatefulWidget {
 }
 
 class _ContentState extends State<Content> {
+
   @override
   Widget build(BuildContext context) {
     return new Container(
@@ -60,11 +63,12 @@ class _ContentState extends State<Content> {
             slivers: <Widget>[
               new SliverPadding(
                 padding: const EdgeInsets.all(10.0),
-                sliver: new SliverGrid.count(
+                sliver: new SliverStaggeredGrid.count(
                   crossAxisSpacing: 10.0,
                   mainAxisSpacing: 10.0,
-                  crossAxisCount: 2,
+                  crossAxisCount: 4,
                   children: _createImageCards(images),
+                  staggeredTiles: _generateRandomTiles(images.length),
                 ),
               ),
             ],
@@ -96,10 +100,10 @@ Future<List<BooruImage>> _getBooruImages() async {
   return null;
 }
 
-List<Widget> _createImageCards(List<BooruImage> images) {
-  List<Widget> imageCards = new List();
+List<Widget> _createImageTiles(List<BooruImage> images) {
+  List<Widget> imageTiles = new List();
   images.forEach((image){
-    Widget card = new GridTile(
+    Widget tile = new GridTile(
       footer: new GridTileBar(
         backgroundColor: Colors.black54,
         title: new Text(image.image),
@@ -112,7 +116,30 @@ List<Widget> _createImageCards(List<BooruImage> images) {
         onTap: (){},
       ),
     );
+    imageTiles.add(tile);
+  });
+  return imageTiles;
+}
+
+List<Widget> _createImageCards(List<BooruImage> images){
+  List<Widget> imageCards = new List();
+  images.forEach((image){
+    Widget card = new Card(
+      child: new GestureDetector(
+        child: new FadeInImage.memoryNetwork(
+          placeholder: kTransparentImage,
+          image: image.fileUrl,
+        ),
+        onTap: (){},
+      ),
+    );
     imageCards.add(card);
   });
   return imageCards;
+}
+
+List<StaggeredTile> _generateRandomTiles(int count) {
+  Random rnd = new Random();
+  return new List.generate(count,
+      (i) => new StaggeredTile.count(rnd.nextInt(4) + 1, rnd.nextInt(6) + 1));
 }
