@@ -64,10 +64,10 @@ class _ContentState extends State<Content> {
               new SliverPadding(
                 padding: const EdgeInsets.all(10.0),
                 sliver: new SliverStaggeredGrid.count(
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 10.0,
-                  crossAxisCount: 4,
-                  children: _createImageCards(images),
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 4.0,
+                  crossAxisCount: 2,
+                  children: _createImageTiles(images),
                   staggeredTiles: _generateRandomTiles(images.length),
                 ),
               ),
@@ -103,17 +103,20 @@ Future<List<BooruImage>> _getBooruImages() async {
 List<Widget> _createImageTiles(List<BooruImage> images) {
   List<Widget> imageTiles = new List();
   images.forEach((image){
-    Widget tile = new GridTile(
-      footer: new GridTileBar(
-        backgroundColor: Colors.black54,
-        title: new Text(image.image),
-      ),
-      child: new GestureDetector(
-        child: new FadeInImage.memoryNetwork(
-          placeholder: kTransparentImage,
-          image: image.fileUrl,
+    Widget tile = new Card(
+      child: new GridTile(
+        footer: new GridTileBar(
+          backgroundColor: Colors.black54,
+          title: new Text(image.id.toString(), textAlign: TextAlign.center,),
         ),
-        onTap: (){},
+        child: new GestureDetector(
+          child: new FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage,
+            image: image.fileUrl,
+            fit: BoxFit.cover,
+          ),
+          onTap: (){},
+        ),
       ),
     );
     imageTiles.add(tile);
@@ -129,6 +132,7 @@ List<Widget> _createImageCards(List<BooruImage> images){
         child: new FadeInImage.memoryNetwork(
           placeholder: kTransparentImage,
           image: image.fileUrl,
+          fit: BoxFit.cover,
         ),
         onTap: (){},
       ),
@@ -140,6 +144,7 @@ List<Widget> _createImageCards(List<BooruImage> images){
 
 List<StaggeredTile> _generateRandomTiles(int count) {
   Random rnd = new Random();
-  return new List.generate(count,
-      (i) => new StaggeredTile.count(rnd.nextInt(4) + 1, rnd.nextInt(6) + 1));
+  return new List.generate(count, (i) => new StaggeredTile.count(1, i.isOdd? 2 : 1));
+  //return new List.generate(count,
+  //    (i) => new StaggeredTile.count(rnd.nextInt(2) + 1, rnd.nextInt(4) + 1));
 }
