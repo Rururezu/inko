@@ -153,7 +153,7 @@ Future<List<BooruImage>> _getBooruImages(String tags) async {
 
 List<Widget> _createImageTiles(List<BooruImage> images, BuildContext context) {
   List<Widget> imageTiles = new List();
-  images.forEach((image){
+  images.forEach((BooruImage image){
     Widget tile = new Card(
       child: new GridTile(
         footer: new GridTileBar(
@@ -168,7 +168,7 @@ List<Widget> _createImageTiles(List<BooruImage> images, BuildContext context) {
           ),
           onTap: (){
             Navigator.push(context, new MaterialPageRoute(
-              builder: (_) => new DetailsPage(imageSrc: image.fileUrl)
+              builder: (_) => new DetailsPage(image: image)
             ));
           },
         ),
