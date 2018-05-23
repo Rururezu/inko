@@ -84,31 +84,43 @@ class _ContentState extends State<Content> {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      child: new FutureBuilder(
-        future: _getBooruImages(widget.tags),
-        builder: (BuildContext context, AsyncSnapshot snapshot){
-          if(!snapshot.hasData) {
-            return new Center(child: new CircularProgressIndicator(),);
-          }
-          List<BooruImage> images = snapshot.data;
-          return new CustomScrollView(
-            primary: false,
-            slivers: <Widget>[
-              new SliverPadding(
-                padding: const EdgeInsets.all(10.0),
-                sliver: new SliverStaggeredGrid.count(
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                  crossAxisCount: 2,
-                  children: _createImageTiles(images),
-                  staggeredTiles: _generateRandomTiles(images.length),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+    return new Column(
+      children: <Widget>[
+        new Padding(
+          padding: const EdgeInsets.fromLTRB(10.0, 6.0, 4.0, 4.0), 
+          child: new Row(
+            children: _createTagsChip(widget.tags),
+          ),
+        ),
+        new Flexible(
+          child: new FutureBuilder(
+            future: _getBooruImages(widget.tags),
+            builder: (BuildContext context, AsyncSnapshot snapshot){
+              if(!snapshot.hasData) {
+                return new Center(child: new CircularProgressIndicator(),);
+              } else if(snapshot.hasError) {
+                return new Center(child: new Text("An error occured"),);
+              }
+              List<BooruImage> images = snapshot.data;
+              return new CustomScrollView(
+                primary: false,
+                slivers: <Widget>[
+                  new SliverPadding(
+                    padding: const EdgeInsets.all(10.0),
+                    sliver: new SliverStaggeredGrid.count(
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0,
+                      crossAxisCount: 2,
+                      children: _createImageTiles(images),
+                      staggeredTiles: _generateRandomTiles(images.length),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -123,8 +135,12 @@ Future<List<BooruImage>> _getBooruImages(String tags) async {
       var jsonResponse = await response.transform(utf8.decoder).join();
       var data = jsonDecode(jsonResponse);
       List results = data;
-      List<BooruImage> imageList = BooruImage.getImages(results);
-      return imageList;
+      if(results != null) {
+        List<BooruImage> imageList = BooruImage.getImages(results);
+        return imageList;
+      } else {
+        return null;
+      }
     } else {
       print("Failed http call.");
     }
@@ -176,9 +192,31 @@ List<Widget> _createImageCards(List<BooruImage> images){
   return imageCards;
 }
 
+List<Widget> _createTagsChip(String query) {
+  List<Widget> tagChips = new List();
+  List<String> tags = query.split(" ").toList();
+  List<ColorSwatch> colors = [Colors.red, Colors.green, Colors.blue, Colors.amber];
+  
+  if(query == "") {
+    tagChips.add(new Container());
+    return tagChips;
+  }
+
+  tagChips.add(new Text("Query tags:  "));
+  tags.forEach((tag){
+    Widget chip = new Chip(
+      backgroundColor: colors[new Random().nextInt(colors.length)],
+      label: new Text(tag, style: new TextStyle(color: Colors.white),),
+    );
+    tagChips.add(chip);
+    tagChips.add(new Padding(padding: const EdgeInsets.symmetric(horizontal: 2.0),));
+  });
+  return tagChips;
+}
+
 List<StaggeredTile> _generateRandomTiles(int count) {
   Random rnd = new Random();
-  return new List.generate(count, (i) => new StaggeredTile.count(1, rnd.nextInt(2) + 1));
+  return new List.generate(count, (i) => new StaggeredTile.count(1, i.isEven? 2:1));
   //return new List.generate(count,
   //    (i) => new StaggeredTile.count(rnd.nextInt(2) + 1, rnd.nextInt(4) + 1));
 }
