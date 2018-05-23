@@ -8,6 +8,7 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 
+import 'screens/details_page.dart';
 import 'models/booru_image.dart';
 
 const String BASE_URL = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1";
@@ -111,7 +112,7 @@ class _ContentState extends State<Content> {
                       crossAxisSpacing: 4.0,
                       mainAxisSpacing: 4.0,
                       crossAxisCount: 2,
-                      children: _createImageTiles(images),
+                      children: _createImageTiles(images, context),
                       staggeredTiles: _generateRandomTiles(images.length),
                     ),
                   ),
@@ -150,7 +151,7 @@ Future<List<BooruImage>> _getBooruImages(String tags) async {
   return null;
 }
 
-List<Widget> _createImageTiles(List<BooruImage> images) {
+List<Widget> _createImageTiles(List<BooruImage> images, BuildContext context) {
   List<Widget> imageTiles = new List();
   images.forEach((image){
     Widget tile = new Card(
@@ -165,7 +166,11 @@ List<Widget> _createImageTiles(List<BooruImage> images) {
             image: image.fileUrl,
             fit: BoxFit.cover,
           ),
-          onTap: (){},
+          onTap: (){
+            Navigator.push(context, new MaterialPageRoute(
+              builder: (_) => new DetailsPage(imageSrc: image.fileUrl)
+            ));
+          },
         ),
       ),
     );
