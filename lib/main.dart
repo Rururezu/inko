@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_search_bar/flutter_search_bar.dart';
 
 import 'models/booru_image.dart';
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   final String title;
   HomePage({this.title});
+
   @override
   HomePageState createState() {
     return new HomePageState();
@@ -38,24 +40,33 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
 
-  String tags;
+  SearchBar searchBar;
+  String tags="";
+
+  AppBar buildAppBar(BuildContext context) {
+    return new AppBar(
+      title: new Text(widget.title),
+      actions: <Widget>[searchBar.getSearchAction(context)],
+    );
+  }
+
+  HomePageState() {
+    searchBar = new SearchBar(
+      inBar: true,
+      buildDefaultAppBar: buildAppBar,
+      setState: setState,
+      onSubmitted: (String value) {
+        setState(() {
+          tags = value;       
+        });
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-        actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.search, color: Colors.white,),
-            onPressed: (){
-              setState(() {
-                tags = "aisaka_taiga";                
-              });
-            },
-          ),
-        ],
-      ),
+      appBar: searchBar.build(context),
       body: new Content(tags: tags),
     );
   }
@@ -167,7 +178,7 @@ List<Widget> _createImageCards(List<BooruImage> images){
 
 List<StaggeredTile> _generateRandomTiles(int count) {
   Random rnd = new Random();
-  return new List.generate(count, (i) => new StaggeredTile.count(1, i.isOdd? 2 : 1));
+  return new List.generate(count, (i) => new StaggeredTile.count(1, rnd.nextInt(2) + 1));
   //return new List.generate(count,
   //    (i) => new StaggeredTile.count(rnd.nextInt(2) + 1, rnd.nextInt(4) + 1));
 }
