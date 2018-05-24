@@ -13,10 +13,11 @@ class DetailsPage extends StatelessWidget {
         title: new Text(image.tags),
       ),
       body: new Container(
-        child: new ZoomableImage(
-          new NetworkImage(image.fileUrl),
-          backgroundColor: Colors.blue,
-        ),
+          child: new ZoomableImage(
+            new NetworkImage(image.fileUrl),
+            placeholder: new Center(child: CircularProgressIndicator()),
+            backgroundColor: Colors.blue,
+          ),
       ),
     );
   }
