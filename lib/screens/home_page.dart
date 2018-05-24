@@ -13,6 +13,8 @@ import '../main.dart';
 import '../screens/details_page.dart';
 import '../models/booru_image.dart';
 
+List<BooruImage> images;
+
 class HomePage extends StatefulWidget {
   final String title;
   HomePage({this.title});
@@ -42,7 +44,8 @@ class HomePageState extends State<HomePage> {
       setState: setState,
       onSubmitted: (String value) {
         setState(() {
-          tags = value;       
+          tags = value;
+          images = [];
         });
       }
     );
@@ -67,6 +70,28 @@ class Content extends StatefulWidget {
 
 class _ContentState extends State<Content> {
 
+  List<Widget> _createTagsChip(String query) {
+    List<Widget> tagChips = new List();
+    List<String> tags = query.split(" ").toList();
+    List<ColorSwatch> colors = [Colors.red, Colors.green, Colors.blue, Colors.amber];
+    
+    if(query == "") {
+      tagChips.add(new Container());
+      return tagChips;
+    }
+
+    tagChips.add(new Text("Query tags:  "));
+    tags.forEach((tag){
+      Widget chip = new Chip(
+        backgroundColor: colors[new Random().nextInt(colors.length)],
+        label: new Text(tag, style: new TextStyle(color: Colors.white),),
+      );
+      tagChips.add(chip);
+      tagChips.add(new Padding(padding: const EdgeInsets.symmetric(horizontal: 2.0),));
+    });
+    return tagChips;
+  }
+
   FutureBuilder<List<BooruImage>> _booruFutureBuilder(){
     return new FutureBuilder(
       future: _getBooruImages(widget.tags),
@@ -76,7 +101,7 @@ class _ContentState extends State<Content> {
         if(snapshot.connectionState == ConnectionState.done && !snapshot.hasData)
             return new Center(child: new Text("No images found"),);
         else {
-          List<BooruImage> images = snapshot.data;
+          images = snapshot.data;
           return new CustomScrollView(
             primary: false,
             slivers: <Widget>[
@@ -168,27 +193,6 @@ List<Widget> _createImageCards(List<BooruImage> images, BuildContext context) {
   return imageTiles;
 }
 
-List<Widget> _createTagsChip(String query) {
-  List<Widget> tagChips = new List();
-  List<String> tags = query.split(" ").toList();
-  List<ColorSwatch> colors = [Colors.red, Colors.green, Colors.blue, Colors.amber];
-  
-  if(query == "") {
-    tagChips.add(new Container());
-    return tagChips;
-  }
-
-  tagChips.add(new Text("Query tags:  "));
-  tags.forEach((tag){
-    Widget chip = new Chip(
-      backgroundColor: colors[new Random().nextInt(colors.length)],
-      label: new Text(tag, style: new TextStyle(color: Colors.white),),
-    );
-    tagChips.add(chip);
-    tagChips.add(new Padding(padding: const EdgeInsets.symmetric(horizontal: 2.0),));
-  });
-  return tagChips;
-}
 
 List<StaggeredTile> _generateRandomTiles(int count) {
   Random rnd = new Random();
